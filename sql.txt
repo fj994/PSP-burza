@@ -1,0 +1,8 @@
+create DATABASE burza
+
+create table dionice (
+id int not null auto_increment primary key,
+symbol varchar(50) not null,
+last_refreshed DATETIME not null,
+time_zone varchar(50) not null
+);
