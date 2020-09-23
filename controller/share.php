@@ -39,11 +39,13 @@ class Share
 
     static function update() {
         require($_SERVER['DOCUMENT_ROOT'] . '/model/shareModel.php');
-        ShareModel::update();
+        $msg = ShareModel::update();
+        include($_SERVER['DOCUMENT_ROOT'] . '/view/Response.php');
     }
 
     static function get($format, $params) {
         require($_SERVER['DOCUMENT_ROOT'] . '/model/shareModel.php');
-        ShareModel::$format($params);
+        $msg = ShareModel::$format($params);
+        include($_SERVER['DOCUMENT_ROOT'] . '/view/Response.php');
     }
 }

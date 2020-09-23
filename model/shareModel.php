@@ -109,58 +109,34 @@ class ShareModel
             array_push($response, $shareObject);
         }
 
-        echo json_encode($response);
+        return json_encode($response);
     }
     static function week($params)
     {
-        $response = [];
-
         $rangeStart = $params['year'] . '-' . ($params['month'] < 10 ? '0' : '') . $params['month'] . '-' . ($params['day'] < 10 ? '0' : '') . $params['day'];
         $rangeEnd = $params['year'] . '-' . ($params['month'] < 10 ? '0' : '') . $params['month'] . '-' . ($params['day'] < 10 ? '0' : '') . ($params['day'] + 6);
 
-        $shares = R::findAll('share');
-
-        foreach ($shares as $share) {
-            $shareData = R::findAll('daily', "share_id = ? AND date BETWEEN '$rangeStart' AND '$rangeEnd'", [$share['id']]);
-
-            $shareObject = new stdClass();
-            $shareObject->symbol = $share['symbol'];
-            $shareObject->data = $shareData;
-
-            array_push($response, $shareObject);
-        }
-
-        echo json_encode($response);
+        return ShareModel::getShareBetweenDates($rangeStart, $rangeEnd);    
     }
 
     static function month($params)
     {
-        $response = [];
-
         $rangeStart = $params['year'] . '-' . ($params['month'] < 10 ? '0' : '') . $params['month'] . '-01';
         $rangeEnd = $params['year'] . '-' . ($params['month'] + 1 < 10 ? '0' : '') . ($params['month'] + 1) . '-01';
 
-        $shares = R::findAll('share');
-        
-        foreach($shares as $share) {
-            $shareData = R::findAll('daily', "share_id = ? AND date BETWEEN '$rangeStart' AND '$rangeEnd'", [$share['id']]);
-
-            $shareObject = new stdClass();
-            $shareObject->symbol = $share['symbol'];
-            $shareObject->data = $shareData;
-
-            array_push($response, $shareObject);
-        }
-        
-        echo json_encode($response);
+        return ShareModel::getShareBetweenDates($rangeStart, $rangeEnd);    
     }
 
     static function year($params)
     {
-        $response = [];
-
         $rangeStart = $params['year'] . '-01-01';
         $rangeEnd = $params['year'] . '-12-31';
+
+        return ShareModel::getShareBetweenDates($rangeStart, $rangeEnd);    
+    }
+
+    static function getShareBetweenDates($rangeStart, $rangeEnd) {
+        $response = [];
 
         $shares = R::findAll('share');
 
@@ -174,6 +150,6 @@ class ShareModel
             array_push($response, $shareObject);
         }
 
-        echo json_encode($response);
+        return json_encode($response);
     }
 }
