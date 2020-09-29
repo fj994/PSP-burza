@@ -1,4 +1,6 @@
 <?php
+namespace model;
+
 class ShareModel
 {
     function __construct($symbol, $last_refreshed, $time_zone)
@@ -10,15 +12,15 @@ class ShareModel
 
     function add()
     {
-        $share = R::findOne('share', 'symbol=?', array($this->symbol));
+        $share = \R::findOne('share', 'symbol=?', array($this->symbol));
 
         if (!$share) {
-            $share = R::dispense('share');
+            $share = \R::dispense('share');
             $share->symbol = $this->symbol;
             $share->last_refreshed = $this->last_refreshed;
             $share->time_zone = $this->time_zone;
             $share->ownDailyList = array();
-            $id = R::store($share);
+            $id = \R::store($share);
 
             ShareModel::updateDaily($share->symbol, false);
             return 'Added succesfully';
@@ -29,12 +31,12 @@ class ShareModel
 
     static function delete($symbol)
     {
-        $share = R::findOne('share', 'symbol=?', array($symbol));
+        $share = \R::findOne('share', 'symbol=?', array($symbol));
 
         if ($share) {
             $share->xownDailyList = array();
-            R::store($share);
-            R::trash($share);
+            \R::store($share);
+            \R::trash($share);
             return $symbol . ' successfully deleted';
         }
 
@@ -43,7 +45,7 @@ class ShareModel
 
     static function updateDaily($symbol, $compact = true)
     {
-        $share = R::findOne('share', 'symbol=?', array($symbol));
+        $share = \R::findOne('share', 'symbol=?', array($symbol));
 
         if ($share) {
             $lastDate = end($share->ownDailyList);
@@ -63,7 +65,7 @@ class ShareModel
 
             foreach (array_reverse($obj["Time Series (Daily)"]) as $key => $value) {
                 if ($lastDate < $key) {
-                    $dailyValue = R::dispense('daily');
+                    $dailyValue = \R::dispense('daily');
                     echo $key;
                     $dailyValue->date = $key;
                     $dailyValue->open = $value["1. open"];
@@ -75,7 +77,7 @@ class ShareModel
                     $share->ownDailyList[] = $dailyValue;
                 }
             }
-            R::store($share);
+            \R::store($share);
 
             return 'share ';
         } else {
@@ -85,7 +87,7 @@ class ShareModel
 
     static function update()
     {
-        $shares = R::find('share');
+        $shares = \R::find('share');
         foreach ($shares as $share) {
             ShareModel::updateDaily($share->symbol);
         }
@@ -97,12 +99,12 @@ class ShareModel
 
         $date = $params['year'] . '-' . ($params['month'] < 10 ? '0' : '') . $params['month'] . '-' . ($params['day'] < 10 ? '0' : '') . $params['day'];
 
-        $shares = R::findAll('share');
+        $shares = \R::findAll('share');
 
         foreach ($shares as $share) {
-            $shareData = R::findAll('daily', "share_id = ? AND date = ?", [$share['id'], $date]);
+            $shareData = \R::findAll('daily', "share_id = ? AND date = ?", [$share['id'], $date]);
 
-            $shareObject = new stdClass();
+            $shareObject = new \stdClass();
             $shareObject->symbol = $share['symbol'];
             $shareObject->data = $shareData;
 
@@ -138,12 +140,12 @@ class ShareModel
     static function getShareBetweenDates($rangeStart, $rangeEnd) {
         $response = [];
 
-        $shares = R::findAll('share');
+        $shares = \R::findAll('share');
 
         foreach ($shares as $share) {
-            $shareData = R::findAll('daily', "share_id = ? AND date BETWEEN '$rangeStart' AND '$rangeEnd'", [$share['id']]);
+            $shareData = \R::findAll('daily', "share_id = ? AND date BETWEEN '$rangeStart' AND '$rangeEnd'", [$share['id']]);
 
-            $shareObject = new stdClass();
+            $shareObject = new \stdClass();
             $shareObject->symbol = $share['symbol'];
             $shareObject->data = $shareData;
 

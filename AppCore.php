@@ -1,11 +1,21 @@
 <?php
+spl_autoload_register(function ($class) {
+    $str = str_replace('\\', DIRECTORY_SEPARATOR, $class) . '.php';
+
+    if(file_exists($str)) {
+        include($str);
+    } else {
+        return true;
+    }
+});
+
 class AppCore
 {
     function __construct() {
-        require_once($_SERVER['DOCUMENT_ROOT'] . '/dbSetup.php');
-        require('util/router.php');
-
-        $router = new Router();
+        $db = new dbSetup();
+        $router = new util\Router();
         $router->route();
+
+        
     }
 }

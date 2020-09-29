@@ -1,9 +1,12 @@
 <?php
+namespace controller;
+
 class Share
 {
     static function add()
     {
-        $params = Share::getSymbolParam();
+        $params = json_decode(file_get_contents('php://input'), true);
+
         $response = file_get_contents("https://www.alphavantage.co/query?function=TIME_SERIES_DAILY&symbol=" . $params['symbol'] . "&apikey=T3TWWW76K5E070HC");
         
         if (!$response) {
@@ -13,9 +16,8 @@ class Share
         $obj = json_decode($response, true);
 
         if (!array_key_exists('Error Message', $obj)) {
-            require($_SERVER['DOCUMENT_ROOT'] . '/model/shareModel.php');
 
-            $share = new ShareModel($obj['Meta Data']['2. Symbol'], $obj['Meta Data']['3. Last Refreshed'], $obj['Meta Data']['5. Time Zone']);
+            $share = new \model\ShareModel($obj['Meta Data']['2. Symbol'], $obj['Meta Data']['3. Last Refreshed'], $obj['Meta Data']['5. Time Zone']);
             $msg = $share->add();
         } else {
             $msg = 'Invalid share symbol';
@@ -26,9 +28,8 @@ class Share
 
     static function delete()
     {
-        $params = Share::getSymbolParam();
-        require($_SERVER['DOCUMENT_ROOT'] . '/model/shareModel.php');
-        $msg = ShareModel::delete($params['symbol']);
+        $params = json_decode(file_get_contents('php://input'), true);
+        $msg = \model\ShareModel::delete($params['symbol']);
         include($_SERVER['DOCUMENT_ROOT'] . '/view/Response.php');
     }
 
@@ -38,14 +39,12 @@ class Share
     }
 
     static function update() {
-        require($_SERVER['DOCUMENT_ROOT'] . '/model/shareModel.php');
-        $msg = ShareModel::update();
+        $msg = \model\ShareModel::update();
         include($_SERVER['DOCUMENT_ROOT'] . '/view/Response.php');
     }
 
     static function get($format, $params) {
-        require($_SERVER['DOCUMENT_ROOT'] . '/model/shareModel.php');
-        $msg = ShareModel::$format($params);
+        $msg = \model\ShareModel::$format($params);
         include($_SERVER['DOCUMENT_ROOT'] . '/view/Response.php');
     }
 }
